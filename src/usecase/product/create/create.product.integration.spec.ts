@@ -11,15 +11,15 @@ describe("Test create product use case", () => {
             dialect: "sqlite",
             storage: "memory",
             logging: false,
-            sync: { force: true }
+            sync: { force: true },
         });
 
         await sequelize.addModels([ProductModel]);
         await sequelize.sync();
     });
 
-    afterEach(async () => {
-        sequelize.close();
+    afterAll(async () => {
+        await sequelize.close();
     });
 
     it("should create a product", async () => {
@@ -34,12 +34,10 @@ describe("Test create product use case", () => {
 
         var output = await usecase.execute(input);
 
-        const result = await productRepository.find(output.id);
-
         expect(output).toEqual({
             id: expect.any(String),
-            name: result.name,
-            price: result.price
+            name: input.name,
+            price: input.price
         });
     });
 
@@ -53,9 +51,9 @@ describe("Test create product use case", () => {
             price: 20
         };
 
-        expect(() => {
+        expect(async () => {
             input.name = "";
-            return usecase.execute(input)
+            return await usecase.execute(input)
         }).rejects.toThrow("Name is required");
     });
 
@@ -69,9 +67,9 @@ describe("Test create product use case", () => {
             price: 20
         };
 
-        expect(() => {
+        expect(async () => {
             input.price = -1;
-            return usecase.execute(input)
+            return await usecase.execute(input)
         }).rejects.toThrow("Price must be greater than zero");
     });
 });

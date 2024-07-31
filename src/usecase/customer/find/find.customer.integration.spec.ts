@@ -20,7 +20,7 @@ describe("Test find customer use case", () => {
     await sequelize.sync();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await sequelize.close();
   });
 

@@ -4,6 +4,7 @@ import ProductRepository from "../../../infrastructure/product/repository/sequel
 import FindProductUseCase from "./find.product.usecase";
 import Product from "../../../domain/product/entity/product";
 import { Sequelize } from "sequelize-typescript";
+import CreateProductUseCase from "../create/create.product.usecase";
 
 describe("Test find product use case", () => {
     let sequelize: Sequelize;
@@ -19,30 +20,34 @@ describe("Test find product use case", () => {
         await sequelize.sync();
     });
 
-    afterEach(async () => {
+    afterAll(async () => {
         await sequelize.close();
     });
 
     it("Should find a product", async () => {
         const productRepository = new ProductRepository();
         const usecase = new FindProductUseCase(productRepository);
-
-        const product = new Product("123", "Product A", 10);
-
-        await productRepository.create(product);
+        const usecaseCreate = new CreateProductUseCase(productRepository);
 
         const input = {
-            id: "123"
-        }
-
-        const output = {
-            id: "123",
+            type: "a",
             name: "Product A",
-            price: 10
+            price: 20
+        };
+
+        const output = await usecaseCreate.execute(input);
+
+        const inputFind = {
+            id: output.id
         }
 
-        const result = await usecase.execute(input);
-        expect(result).toEqual(output);
+        const result = await usecase.execute(inputFind);
+
+        expect(result).toEqual({
+            id: expect.any(String),
+            name: input.name,
+            price: input.price
+        });
     });
 
     it("Should not a find product", async () => {
@@ -53,8 +58,8 @@ describe("Test find product use case", () => {
             id: "456"
         }
 
-        expect(() => {
-            return usecase.execute(input);
+        expect(async () => {
+            return await usecase.execute(input);
         }).rejects.toThrow("Product not found")
     });
 })

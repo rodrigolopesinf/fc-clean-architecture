@@ -3,6 +3,7 @@ import ProductModel from "../../../infrastructure/product/repository/sequelize/p
 import UpdateProductUseCase from "./update.product.usecase";
 import ProductRepository from "../../../infrastructure/product/repository/sequelize/product.repository";
 import Product from "../../../domain/product/entity/product";
+import CreateProductUseCase from "../create/create.product.usecase";
 
 describe("Test update product use case", () => {
     let sequelize: Sequelize;
@@ -20,18 +21,24 @@ describe("Test update product use case", () => {
     });
 
     afterAll(async () => {
-        sequelize.close();
+        await sequelize.close();
     });
 
     it("should update a product", async () => {
         const productRepository = new ProductRepository();
         const usecase = new UpdateProductUseCase(productRepository);
+        const usecaseCreate = new CreateProductUseCase(productRepository);
 
-        const product = new Product("123", "Product A", 20);
-        await productRepository.create(product);
+        const inputCreate = {
+            type: "a",
+            name: "Product A",
+            price: 20
+        };
+
+        const outputCreate = await usecaseCreate.execute(inputCreate);
 
         const input = {
-            id: "123",
+            id: outputCreate.id,
             name: "Product B",
             price: 30
         };
@@ -48,12 +55,18 @@ describe("Test update product use case", () => {
     it("should thrown an error when name is missing", async () => {
         const productRepository = new ProductRepository();
         const usecase = new UpdateProductUseCase(productRepository);
+        const usecaseCreate = new CreateProductUseCase(productRepository);
 
-        const product = new Product("123", "Product A", 20);
-        await productRepository.create(product);
+        const inputCreate = {
+            type: "a",
+            name: "Product A",
+            price: 20
+        };
+
+        const output = await usecaseCreate.execute(inputCreate);
 
         const input = {
-            id: "123",
+            id: output.id,
             name: "",
             price: 30
         };
@@ -66,18 +79,24 @@ describe("Test update product use case", () => {
     it("should thrown an error when price is less than zero", async () => {
         const productRepository = new ProductRepository();
         const usecase = new UpdateProductUseCase(productRepository);
+        const usecaseCreate = new CreateProductUseCase(productRepository);
 
-        const product = new Product("123", "Product A", 20);
-        await productRepository.create(product);
+        const inputCreate = {
+            type: "a",
+            name: "Product A",
+            price: 20
+        };
+
+        const output = await usecaseCreate.execute(inputCreate);
 
         const input = {
-            id: "123",
+            id: output.id,
             name: "Product B",
             price: -1
         };
 
         expect(async () => {
             return await usecase.execute(input);
-        }).rejects.toThrow("Price must be greater than zero");
+        }).rejects.toThrow("Price must be greater than zero")
     });
 })
