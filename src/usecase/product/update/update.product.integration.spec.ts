@@ -11,12 +11,12 @@ describe("Test update product use case", () => {
     beforeEach(async () => {
         sequelize = new Sequelize({
             dialect: "sqlite",
-            storage: "memory",
+            storage: ":memory:",
             logging: false,
             sync: { force: true }
         });
 
-        await sequelize.addModels([ProductModel]);
+        sequelize.addModels([ProductModel]);
         await sequelize.sync();
     });
 
@@ -95,8 +95,8 @@ describe("Test update product use case", () => {
             price: -1
         };
 
-        expect(async () => {
-            return await usecase.execute(input);
+        await expect(() => {
+            return usecase.execute(input);
         }).rejects.toThrow("Price must be greater than zero")
     });
 })
