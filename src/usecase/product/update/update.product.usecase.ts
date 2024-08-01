@@ -16,8 +16,7 @@ export default class UpdateProductUseCase {
         product.changeName(input.name);
         product.changePrice(input.price);
 
-        const productUpdate = new Product(product.id, product.name, product.price);
-        await this.productRepository.update(productUpdate);
+        await this.productRepository.update(product);
 
         return {
             id: product.id,

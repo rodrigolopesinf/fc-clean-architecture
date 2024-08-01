@@ -14,7 +14,8 @@ export default class CreateProductUseCase {
         input: InputCreateProductDto
     ): Promise<OutPutCreateProductDto> {
         const product = ProductFactory.create(input.type, input.name, input.price);
-
+        
+        console.log(product)
         const productCreate = new Product(product.id, product.name, product.price);
         await this.productRepository.create(productCreate);
 

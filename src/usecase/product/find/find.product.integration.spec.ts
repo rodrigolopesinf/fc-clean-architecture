@@ -12,7 +12,7 @@ describe("Test find product use case", () => {
     beforeEach(async () => {
         sequelize = new Sequelize({
             dialect: "sqlite",
-            storage: "memory",
+            storage: ":memory:",
             logging: false,
             sync: { force: true },
         });
@@ -58,8 +58,7 @@ describe("Test find product use case", () => {
             id: "456"
         }
 
-        expect(async () => {
-            return await usecase.execute(input);
-        }).rejects.toThrow("Product not found")
+        await expect(usecase.execute(input)).rejects.toThrow("Product not found")
+
     });
 })

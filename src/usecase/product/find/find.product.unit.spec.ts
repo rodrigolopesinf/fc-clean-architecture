@@ -34,6 +34,11 @@ describe("Unit teste find product use case", () => {
 
     it("should not find a product", async () => {
         const productMockRepository = MockRepository();
+
+        productMockRepository.find.mockImplementation(() => {
+            throw new Error("Product not found")
+        })
+
         const usecase = new FindProductUseCase(productMockRepository);
 
         const input = {
